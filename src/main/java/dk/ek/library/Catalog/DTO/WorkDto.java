@@ -1,13 +1,12 @@
 package dk.ek.library.Catalog.DTO;
 
-import java.util.List;
+import java.util.Set;
 
 public record WorkDto(
         Long id,
         String title,
         String workType,
         String details,
-        String author,
-        List<EditionDto> editions,
-        String subjects
+        Set<Long> authorIds,
+        Set<Long> subjectIds
 ) {}

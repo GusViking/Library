@@ -20,9 +20,7 @@ public class Work {
     private WorkType workType;
 
     private String details;
-    private String subjects;
 
-    // Many-to-Many with Author
     @ManyToMany
     @JoinTable(
             name = "work_author",
@@ -31,7 +29,14 @@ public class Work {
     )
     private Set<Author> authors = new HashSet<>();
 
-    // --- Getters & Setters ---
+    @ManyToMany
+    @JoinTable(
+            name = "work_subject",
+            joinColumns = @JoinColumn(name = "work_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private Set<Subject> subjects = new HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -64,13 +69,7 @@ public class Work {
         this.details = details;
     }
 
-    public String getSubjects() {
-        return subjects;
-    }
 
-    public void setSubjects(String subjects) {
-        this.subjects = subjects;
-    }
 
     public Set<Author> getAuthors() {
         return authors;
@@ -78,5 +77,8 @@ public class Work {
 
     public void setAuthors(Set<Author> authors) {
         this.authors = authors;
+    }
+
+    public void setSubjects(String subjects) {
     }
 }
