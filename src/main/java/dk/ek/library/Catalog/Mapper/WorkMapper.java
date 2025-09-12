@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -17,23 +18,21 @@ public class WorkMapper {
                 work.getTitle(),
                 work.getWorkType() != null ? work.getWorkType().name() : null,
                 work.getDetails(),
-                work.getAuthors(),
-                work.getEditions() != null
-                        ? work.getEditions().stream().map(WorkMapper::toEditionDto).collect(Collectors.toList())
-                        : List.of(),
-                work.getSubjects()
+                work.getAuthors().stream().map(Author::getId).collect(Collectors.toSet()),
+                work.getSubjects().stream().map(Subject::getId).collect(Collectors.toSet()),
+                work.getEditions().stream().map(WorkMapper::toEditionDto).collect(Collectors.toList())
         );
     }
 
-    public Work toWorkEntity(WorkDto dto) {
+    public Work toWorkEntity(WorkDto dto, Set<Author> authors, Set<Subject> subjects) {
         Work work = new Work();
         work.setId(dto.id());
         work.setTitle(dto.title());
         work.setWorkType(dto.workType() != null ? WorkType.valueOf(dto.workType()) : null);
         work.setDetails(dto.details());
-        work.setAuthors(dto.author());
-        work.setSubjects(dto.subjects());
-        // editions handled separately to avoid circular mapping
+        work.setAuthors(authors);
+        work.setSubjects(subjects);
+        // editions handled separately
         return work;
     }
 
@@ -75,12 +74,5 @@ public class WorkMapper {
         publisher.setAddress(dto.address());
         publisher.setContactInfo(dto.contactInfo());
         return publisher;
-    }
-    public WorkDto toDto(Work work) {
-        return toWorkDto(work);
-    }
-
-    public Work toEntity(WorkDto dto) {
-        return toWorkEntity(dto);
     }
 }

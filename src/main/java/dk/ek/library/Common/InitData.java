@@ -1,14 +1,14 @@
 package dk.ek.library.Common;
 
 import dk.ek.library.Catalog.Model.*;
-import dk.ek.library.Catalog.Repository.EditionRepository;
-import dk.ek.library.Catalog.Repository.PublisherRepository;
-import dk.ek.library.Catalog.Repository.WorkRepository;
+import dk.ek.library.Catalog.Repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import static dk.ek.library.Catalog.Model.WorkType.BOOK;
 import java.util.List;
+import java.util.Set;
+
+import static dk.ek.library.Catalog.Model.WorkType.BOOK;
 
 @Component
 public class InitData implements CommandLineRunner {
@@ -16,13 +16,19 @@ public class InitData implements CommandLineRunner {
     private final WorkRepository workRepository;
     private final EditionRepository editionRepository;
     private final PublisherRepository publisherRepository;
+    private final AuthorRepository authorRepository;
+    private final SubjectRepository subjectRepository;
 
     public InitData(WorkRepository workRepository,
                     EditionRepository editionRepository,
-                    PublisherRepository publisherRepository) {
+                    PublisherRepository publisherRepository,
+                    AuthorRepository authorRepository,
+                    SubjectRepository subjectRepository) {
         this.workRepository = workRepository;
         this.editionRepository = editionRepository;
         this.publisherRepository = publisherRepository;
+        this.authorRepository = authorRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     @Override
@@ -40,27 +46,39 @@ public class InitData implements CommandLineRunner {
 
         publisherRepository.saveAll(List.of(publisher1, publisher2));
 
+        // --- Authors ---
+        Author author1 = new Author();
+        author1.setName("J.R.R. Tolkien");
+
+        authorRepository.save(author1);
+
+        // --- Subjects ---
+        Subject subject1 = new Subject();
+        subject1.setName("Fantasy");
+
+        subjectRepository.save(subject1);
+
         // --- Works ---
         Work work1 = new Work();
         work1.setTitle("Lord of the Rings: Fellowship of the Ring");
         work1.setWorkType(BOOK);
         work1.setDetails("Introduction to the universe of J.R.R. Tolkien");
-        work1.setAuthors("J.R.R. Tolkien");
-        work1.setSubjects("Fantasy");
+        work1.setAuthors(Set.of(author1));
+        work1.setSubjects(Set.of(subject1));
 
         Work work2 = new Work();
         work2.setTitle("Lord of the Rings: Two Towers");
         work2.setWorkType(BOOK);
         work2.setDetails("The Middle of the Adventure");
-        work2.setAuthors("J.R.R. Tolkien");
-        work2.setSubjects("Fantasy");
+        work2.setAuthors(Set.of(author1));
+        work2.setSubjects(Set.of(subject1));
 
         Work work3 = new Work();
         work3.setTitle("Lord of the Rings: Return of the King");
         work3.setWorkType(BOOK);
         work3.setDetails("The End of an Era");
-        work3.setAuthors("J.R.R. Tolkien");
-        work3.setSubjects("Fantasy");
+        work3.setAuthors(Set.of(author1));
+        work3.setSubjects(Set.of(subject1));
 
         workRepository.saveAll(List.of(work1, work2, work3));
 
@@ -82,10 +100,10 @@ public class InitData implements CommandLineRunner {
         editionRepository.saveAll(List.of(edition1, edition2));
 
         // Link editions to works (keep bidirectional relationship consistent)
-        work1.setEditions(List.of(edition1));
-        work2.setEditions(List.of(edition2));
+        work1.setEditions(Set.of(edition1));
+        work2.setEditions(Set.of(edition2));
         workRepository.saveAll(List.of(work1, work2));
 
-        System.out.println("Works, Editions, and Publishers inserted into database!");
+        System.out.println("Works, Editions, Authors, Subjects, and Publishers inserted into database!");
     }
 }
